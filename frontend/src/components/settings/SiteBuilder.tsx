@@ -20,6 +20,8 @@ import { siteDefaults } from '../../data/siteDefaults';
 import {
   clearSettingsOverrides,
   clearSiteSettingsCache,
+  disablePreviewMode,
+  enablePreviewMode,
   markSettingsPublished,
   mergeSectionWithDefault,
   setSettingsOverrides,
@@ -115,7 +117,10 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     setSettingsOverrides(drafts);
-    return () => clearSettingsOverrides();
+    return () => {
+      clearSettingsOverrides();
+      disablePreviewMode();
+    };
   }, [drafts]);
 
   // Load saved settings once and treat them as the saved baseline.
@@ -229,13 +234,6 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
     onClose();
   };
 
-  // Preview shows the site with the current drafts applied (?preview=1) inside
-  // the builder, so it works even where pop-ups are blocked. The live site (no
-  // flag) is untouched until Save & Publish.
-  const openPreviewTab = () => {
-    window.open('/?preview=1', '_blank');
-  };
-
   return (
     <div className="fixed inset-0 z-[200] bg-[#f0f0f0] flex flex-col">
       {/* ---------- Top bar ---------- */}
@@ -272,7 +270,7 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={() => setPreviewOpen(true)} icon={<Eye size={15} />}>
+          <Button variant="secondary" size="sm" onClick={() => { enablePreviewMode(); setPreviewOpen(true); }} icon={<Eye size={15} />}>
             Preview
           </Button>
           <Button size="sm" onClick={saveAll} loading={saving} icon={<FloppyDisk size={15} weight="bold" />}>
@@ -389,11 +387,18 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
                 Your unsaved edits are applied here — the live site stays unchanged until Save &amp; Publish.
               </span>
               <div className="ml-auto flex items-center gap-2">
-                <Button variant="secondary" size="sm" onClick={openPreviewTab} icon={<ArrowSquareOut size={14} />}>
+                {/* A real link so the tab opens even with a strict popup blocker. */}
+                <a
+                  href="/?preview=1"
+                  target="_blank"
+                  rel="noopener"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-white text-ink border border-ink/20 hover:border-ink/40 hover:bg-ink/[0.03] px-3.5 py-1.5 text-xs font-display font-extrabold transition-all duration-200"
+                >
+                  <ArrowSquareOut size={14} />
                   Open in new tab
-                </Button>
+                </a>
                 <button
-                  onClick={() => setPreviewOpen(false)}
+                  onClick={() => { disablePreviewMode(); setPreviewOpen(false); }}
                   className="p-2 rounded-lg text-ink-soft hover:bg-ink/5 hover:text-ink transition-colors"
                   aria-label="Close preview"
                   title="Close preview"

@@ -17,6 +17,18 @@ const PUBLISH_KEY = 'puhub_settings_published_at';
 // Stale drafts (e.g. the browser was closed without saving) expire after an hour.
 const OVERRIDE_TTL_MS = 60 * 60 * 1000;
 
+/** Reads just the draft timestamp (for cheap change detection in preview). */
+function readOverrideTs(): number {
+  try {
+    const raw = localStorage.getItem(OVERRIDE_KEY);
+    if (!raw) return 0;
+    const parsed = JSON.parse(raw) as { ts?: number };
+    return parsed.ts ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
 function getStoredOverrides(): Record<string, unknown> {
   if (storedOverrides) return storedOverrides;
   try {
@@ -148,20 +160,41 @@ export function mergeSectionWithDefault(
 const PREVIEW_KEY = 'puhub_preview_mode';
 
 /**
- * True when this tab is a site-builder preview. The preview is entered via
- * ?preview=1 and persisted in sessionStorage (per-tab), so navigating between
- * pages inside the preview keeps drafts applied — while any other tab stays on
- * published content.
+ * True when this tab is a site-builder preview. Preview mode is entered by the
+ * site builder (sessionStorage flag, shared with the preview iframe in the
+ * same tab) or by opening the site with ?preview=1. It is scoped per-tab, so
+ * other tabs and visitors always see published content. This does not depend
+ * on the query string surviving the deployment's URL rewrites.
  */
 function isPreview(): boolean {
   try {
     if (new URLSearchParams(window.location.search).has('preview')) {
-      sessionStorage.setItem(PREVIEW_KEY, '1');
+      // Top-level windows remember the mode so navigating between pages inside
+      // the preview keeps drafts applied. Frames rely on the builder's flag.
+      if (window.self === window.top) sessionStorage.setItem(PREVIEW_KEY, '1');
       return true;
     }
     return sessionStorage.getItem(PREVIEW_KEY) === '1';
   } catch {
     return false;
+  }
+}
+
+/** Turns on preview mode in this tab (used by the site builder before showing the preview). */
+export function enablePreviewMode(): void {
+  try {
+    sessionStorage.setItem(PREVIEW_KEY, '1');
+  } catch {
+    // ignore storage errors
+  }
+}
+
+/** Turns off preview mode in this tab. */
+export function disablePreviewMode(): void {
+  try {
+    sessionStorage.removeItem(PREVIEW_KEY);
+  } catch {
+    // ignore storage errors
   }
 }
 
@@ -204,7 +237,28 @@ export function useSiteSettings(): SiteSettings {
       }
     };
     window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
+
+    // Storage events are the primary live-update signal, but not every
+    // environment delivers them reliably (some iframe/sandbox cases miss
+    // them). In preview mode, also poll the draft timestamp so edits always
+    // reach the preview within a second.
+    const preview = isPreview();
+    let lastSeenTs = readOverrideTs();
+    const poll = preview
+      ? window.setInterval(() => {
+          const ts = readOverrideTs();
+          if (ts !== lastSeenTs) {
+            lastSeenTs = ts;
+            storedOverrides = null;
+            setTick((n) => n + 1);
+          }
+        }, 700)
+      : undefined;
+
+    return () => {
+      window.removeEventListener('storage', handler);
+      if (poll !== undefined) window.clearInterval(poll);
+    };
   }, []);
 
   const get = (section: string): Record<string, unknown> => resolveSection(section);

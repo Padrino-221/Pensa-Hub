@@ -35,13 +35,8 @@ export function LandingHeader() {
             alt="PENSA UENR logo"
             className="w-8 h-8 object-contain"
           />
-          <span className="flex flex-col leading-tight whitespace-nowrap">
-            <span>{(branding.siteName as string) || 'PENSA-UENR'}</span>
-            {branding.siteTagline ? (
-              <span className="hidden lg:block text-[10px] font-semibold text-white/60 tracking-wide max-w-[260px] truncate">
-                {branding.siteTagline}
-              </span>
-            ) : null}
+          <span className="whitespace-nowrap">
+            {(branding.siteName as string) || 'PENSA-UENR'}
           </span>
         </NavLink>
 
