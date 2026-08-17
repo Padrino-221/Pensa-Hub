@@ -1,8 +1,14 @@
 import { PageHeader } from '../components/landing/PageHeader';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults } from '../data/siteDefaults';
 
 export function PLC() {
+  usePageMeta(
+    'PLC',
+    'PLC — the Peniel Leadership and Character wing of PENSA-UENR, raising godly leaders on the UENR campus.',
+    '/community/plc',
+  );
   const data = useSection('plc', siteDefaults.plc);
   const body = data.body && data.body.length > 0 ? data.body : siteDefaults.plc.body;
   const gallery = data.gallery && data.gallery.length > 0 ? data.gallery : siteDefaults.plc.gallery;

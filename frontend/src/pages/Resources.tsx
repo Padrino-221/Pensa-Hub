@@ -5,6 +5,7 @@ import {
   Scroll, ClipboardText, Crown, Trophy, X, Download,
 } from '@phosphor-icons/react';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults } from '../data/siteDefaults';
 
 interface ResourceCardItem {
@@ -48,6 +49,11 @@ const SECTION_ITEM_ICONS: React.ReactNode[][] = [
 ];
 
 export function Resources() {
+  usePageMeta(
+    'Resources',
+    'Access important PENSA-UENR documents and guides — tenets of the Church, constitutions, and study materials.',
+    '/resources',
+  );
   const data = useSection('resources', siteDefaults.resources);
   const sections = (
     data.sections && data.sections.length > 0 ? data.sections : siteDefaults.resources.sections

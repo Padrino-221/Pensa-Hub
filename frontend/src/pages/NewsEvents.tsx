@@ -2,9 +2,15 @@ import { NavLink } from 'react-router-dom';
 import { ArrowRight } from '@phosphor-icons/react';
 import { PageHeader } from '../components/landing/PageHeader';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults, type NewsArticle } from '../data/siteDefaults';
 
 export function NewsEvents() {
+  usePageMeta(
+    'News & Events',
+    'Official PENSA-UENR news and events — announcements, evangelism reports, opportunities and achievements.',
+    '/community/news',
+  );
   const data = useSection('news', siteDefaults.news);
   const articles: NewsArticle[] =
     data.articles && data.articles.length > 0 ? data.articles : siteDefaults.news.articles;

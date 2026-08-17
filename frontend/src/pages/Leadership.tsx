@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Link as LinkIcon } from '@phosphor-icons/react';
 import { PageHeader } from '../components/landing/PageHeader';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { useSection } from '../hooks/useSiteSettings';
 import { siteDefaults, type LeadershipGroup } from '../data/siteDefaults';
 
@@ -11,6 +12,11 @@ const GROUP_STYLES = [
 ];
 
 export function Leadership() {
+  usePageMeta(
+    'Leadership',
+    'Meet the leadership of PENSA-UENR — the executive team and ministry leaders serving the fellowship at UENR, Sunyani.',
+    '/leadership',
+  );
   const data = useSection('leadership', siteDefaults.leadership);
   const groups: (LeadershipGroup & { accent: string; iconBg: string })[] =
     (data.groups && data.groups.length > 0 ? data.groups : siteDefaults.leadership.groups).map(

@@ -1,8 +1,14 @@
 import { PageHeader } from '../components/landing/PageHeader';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults, type GalleryPhoto } from '../data/siteDefaults';
 
 export function Gallery() {
+  usePageMeta(
+    'Gallery',
+    'Photos from PENSA-UENR events, programs, and campus life at the University of Energy and Natural Resources, Sunyani.',
+    '/community/gallery',
+  );
   const data = useSection('gallery', siteDefaults.gallery);
   const photos: GalleryPhoto[] =
     data.photos && data.photos.length > 0 ? data.photos : siteDefaults.gallery.photos;

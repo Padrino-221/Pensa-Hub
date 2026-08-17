@@ -2,10 +2,16 @@ import { useState } from 'react';
 import { ArrowLeft, ArrowRight, X } from '@phosphor-icons/react';
 import { PageHeader } from '../components/landing/PageHeader';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults, type MinistryData } from '../data/siteDefaults';
 import { ministryIcon } from '../data/ministries';
 
 export function MinistriesPage() {
+  usePageMeta(
+    'Ministries',
+    'Explore the ministries of PENSA-UENR — worship, prayer, outreach, evangelism, and discipleship at UENR, Sunyani.',
+    '/ministries',
+  );
   const styles = useSection('styles', siteDefaults.styles);
   const showIcon = !!styles.showIcons;
   const data = useSection('ministries', siteDefaults.ministries);

@@ -1,6 +1,7 @@
 import { useParams, NavLink } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults, type NewsArticle } from '../data/siteDefaults';
 
 export function NewsDetail() {
@@ -9,6 +10,12 @@ export function NewsDetail() {
   const articles: NewsArticle[] =
     data.articles && data.articles.length > 0 ? data.articles : siteDefaults.news.articles;
   const article = articles.find((item) => item.slug === slug);
+
+  usePageMeta(
+    article?.title || 'News',
+    article?.body?.slice(0, 155) || 'News article from PENSA-UENR.',
+    `/community/news/${slug ?? ''}`,
+  );
 
   if (!article) {
     return (

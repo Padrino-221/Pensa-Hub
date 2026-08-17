@@ -1,8 +1,14 @@
 import { PageHeader } from '../components/landing/PageHeader';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults } from '../data/siteDefaults';
 
 export function Cenacle() {
+  usePageMeta(
+    'Cenacle',
+    'Cenacle — the prayer and intercession wing of PENSA-UENR, devoted to prayer and the presence of God at UENR, Sunyani.',
+    '/community/cenacle',
+  );
   const data = useSection('cenacle', siteDefaults.cenacle);
   const body = data.body && data.body.length > 0 ? data.body : siteDefaults.cenacle.body;
   const gallery = data.gallery && data.gallery.length > 0 ? data.gallery : siteDefaults.cenacle.gallery;

@@ -1,8 +1,14 @@
 import { PageHeader } from '../components/landing/PageHeader';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults } from '../data/siteDefaults';
 
 export function Pensice() {
+  usePageMeta(
+    'PENSICE',
+    'PENSICE — the Pentecost Social and Civic Education wing of PENSA-UENR, serving the campus community at UENR, Sunyani.',
+    '/community/pensice',
+  );
   const data = useSection('pensice', siteDefaults.pensice);
   const body = data.body && data.body.length > 0 ? data.body : siteDefaults.pensice.body;
   const gallery = data.gallery && data.gallery.length > 0 ? data.gallery : siteDefaults.pensice.gallery;

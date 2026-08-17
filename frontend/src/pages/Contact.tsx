@@ -2,11 +2,17 @@ import { useState, type FormEvent } from 'react';
 import { CheckCircle, Envelope, MapPin, Phone, WarningCircle } from '@phosphor-icons/react';
 import { PageHeader } from '../components/landing/PageHeader';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults } from '../data/siteDefaults';
 import { contact } from '../services/api';
 import { errMsg } from '../lib/utils';
 
 export function Contact() {
+  usePageMeta(
+    'Contact Us',
+    'Get in touch with PENSA-UENR — find us at UENR, Sunyani, or reach us by phone and email.',
+    '/contact',
+  );
   const data = useSection('contact', siteDefaults.contact);
   const header = data.header ?? siteDefaults.contact.header;
   const contactDetails = [

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import attendance, audit, auth, contact, finance, members, settings as settings_routes, uploads, users
+from app.api.routes import attendance, audit, auth, contact, finance, members, robots, settings as settings_routes, sitemap, uploads, users
 from app.core.config import settings
 from app.core.database import Base, engine
 
@@ -26,6 +26,11 @@ app.include_router(settings_routes.router, prefix="/api")
 app.include_router(settings_routes.public_router, prefix="/api")
 app.include_router(uploads.router, prefix="/api")
 app.include_router(contact.router, prefix="/api")
+app.include_router(sitemap.router, prefix="/api")
+# Also serve the conventional /sitemap.xml URL (Vercel rewrites it to this service).
+app.include_router(sitemap.router)
+app.include_router(robots.router, prefix="/api")
+app.include_router(robots.router)
 
 
 @app.on_event("startup")

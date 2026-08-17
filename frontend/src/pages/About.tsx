@@ -1,9 +1,15 @@
 import { PageHeader } from '../components/landing/PageHeader';
 import { Values } from '../components/landing/Values';
 import { useSection } from '../hooks/useSiteSettings';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { siteDefaults } from '../data/siteDefaults';
 
 export function About() {
+  usePageMeta(
+    'About Us',
+    'The story of PENSA-UENR — our history, vision and mission as a fellowship of The Church of Pentecost at UENR, Sunyani.',
+    '/about',
+  );
   const data = useSection('about', siteDefaults.about);
   const story = data.story && data.story.length > 0 ? data.story : siteDefaults.about.story;
   const timeline =
