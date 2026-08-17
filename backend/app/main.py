@@ -16,16 +16,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(members.router)
-app.include_router(attendance.router)
-app.include_router(finance.router)
-app.include_router(audit.router)
-app.include_router(settings_routes.router)
-app.include_router(settings_routes.public_router)
-app.include_router(uploads.router)
-app.include_router(contact.router)
+app.include_router(auth.router, prefix="/api")
+app.include_router(users.router, prefix="/api")
+app.include_router(members.router, prefix="/api")
+app.include_router(attendance.router, prefix="/api")
+app.include_router(finance.router, prefix="/api")
+app.include_router(audit.router, prefix="/api")
+app.include_router(settings_routes.router, prefix="/api")
+app.include_router(settings_routes.public_router, prefix="/api")
+app.include_router(uploads.router, prefix="/api")
+app.include_router(contact.router, prefix="/api")
 
 
 @app.on_event("startup")

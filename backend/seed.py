@@ -1,69 +1,56 @@
 """
 Database seeder for PU-HUB backend.
 
-Default behaviour (run by start-puhub.bat):
+Default behaviour (run manually:  python seed.py):
   * Creates tables if missing.
-  * Seeds roles / admin users ONLY IF the users table is empty.
+  * Seeds the SUPER ADMIN account ONLY IF the users table is empty.
+    (Other role accounts are created through the Users page, not the seeder.)
   * Inserts the site-content settings ONLY IF those sections do not yet exist,
     so admin edits made via the Settings page are never overwritten.
 
+The site-content snapshot lives in app/data/site_defaults.json (generated from
+frontend/src/data/siteDefaults.ts, the source of truth). Regenerate it with:
+
+    cd frontend
+    ./node_modules/.bin/tsc src/data/siteDefaults.ts --outDir ../backend/app/data/.gen \
+        --module commonjs --target es2020 --skipLibCheck --ignoreConfig --ignoreDeprecations 6.0
+    node -e "const m=require('../backend/app/data/.gen/siteDefaults.js');const fs=require('fs');\
+fs.writeFileSync('../backend/app/data/site_defaults.json',JSON.stringify(m.siteDefaults,null,2)+'\\n')"
+    rm -rf ../backend/app/data/.gen
+
 Optional flags:
-  --sync  : replace the site-content settings with the current website snapshot
+  --sync  : replace the site-content settings with the snapshot
             (useful during development; run manually:  python seed.py --sync)
 """
 
 import argparse
 import json
+import os
 import uuid
-from datetime import datetime
+from pathlib import Path
 
 from app.core.database import SessionLocal, engine, Base
 from app.models import User, RoleEnum, SiteSetting
 from app.core.security import hash_password
 
-# Default accounts — created only when the users table is empty. Passwords are
-# overridable via environment variables (see main()).
+SITE_DEFAULTS_PATH = Path(__file__).parent / "app" / "data" / "site_defaults.json"
+
+# The super admin account — created only when the users table is empty. Email and
+# password are overridable via environment variables (SEED_SUPER_ADMIN_EMAIL /
+# SEED_SUPER_ADMIN_PASSWORD), so production can avoid the default password.
 DEFAULT_USERS = [
     {
         "full_name": "Super Admin",
-        "email": "admin@puhub.com",
+        "email": os.getenv("SEED_SUPER_ADMIN_EMAIL", "admin@puhub.com"),
         "phone": "024 000 0001",
-        "password": "admin123",
+        "password": os.getenv("SEED_SUPER_ADMIN_PASSWORD", "admin123"),
         "role": RoleEnum.super_admin,
-    },
-    {
-        "full_name": "Admin (Students)",
-        "email": "student.admin@puhub.com",
-        "phone": "024 000 0002",
-        "password": "student123",
-        "role": RoleEnum.admin_student,
-    },
-    {
-        "full_name": "Admin (Alumni)",
-        "email": "alumni.admin@puhub.com",
-        "phone": "024 000 0003",
-        "password": "alumni123",
-        "role": RoleEnum.admin_alumni,
-    },
-    {
-        "full_name": "Finance Secretary",
-        "email": "finance@puhub.com",
-        "phone": "024 000 0004",
-        "password": "finance123",
-        "role": RoleEnum.finance_secretary,
-    },
-    {
-        "full_name": "IT Head",
-        "email": "it.head@puhub.com",
-        "phone": "024 000 0005",
-        "password": "ithead123",
-        "role": RoleEnum.it_head,
     },
 ]
 
 
 def seed_users(db: SessionLocal) -> int:
-    """Create default admin accounts only if the users table is empty."""
+    """Create the super admin account only if the users table is empty."""
     if db.query(User).count() > 0:
         return 0
     created = 0
@@ -84,17 +71,20 @@ def seed_users(db: SessionLocal) -> int:
     return created
 
 
-def seed_settings(db: SessionLocal, snapshot: dict | None = None, force: bool = False) -> int:
-    """Insert site-content settings only if a section is missing (or --sync).
+def load_snapshot() -> dict | None:
+    """Load the site-content snapshot shipped with the backend."""
+    if not SITE_DEFAULTS_PATH.exists():
+        return None
+    with open(SITE_DEFAULTS_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-    The site-content snapshot lives in the frontend (frontend/src/data/siteDefaults.ts)
-    and the public website falls back to those defaults when a section is unsaved,
-    so seeding settings is optional. Pass an explicit snapshot dict, or use --sync
-    with a snapshot file, to populate them.
-    """
+
+def seed_settings(db: SessionLocal, snapshot: dict | None = None, force: bool = False) -> int:
+    """Insert site-content settings only if a section is missing (or --sync)."""
     if snapshot is None:
-        # No backend copy of the site content: the website renders from its own
-        # defaults until the IT Head saves sections through the Site Builder.
+        # No snapshot available: the website renders from its own defaults
+        # (frontend/src/data/siteDefaults.ts) until sections are saved via the
+        # Site Builder.
         return 0
     written = 0
     for section, value in snapshot.items():
@@ -120,11 +110,11 @@ def main():
     try:
         users = seed_users(db)
         print(f"Seeded {users} user(s)" if users else "Users already present — skipping.")
-        settings = seed_settings(db, force=args.sync)
+        settings = seed_settings(db, load_snapshot(), force=args.sync)
         if settings:
             print(f"Seeded {settings} setting section(s)")
         else:
-            print("No site-content snapshot in backend — settings will render from website defaults until saved via the Site Builder.")
+            print("No site-content snapshot found — settings will render from website defaults until saved via the Site Builder.")
     finally:
         db.close()
 
