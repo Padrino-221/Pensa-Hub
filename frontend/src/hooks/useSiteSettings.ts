@@ -6,10 +6,10 @@ let cache: Record<string, unknown> | null = null;
 let inflight: Promise<Record<string, unknown>> | null = null;
 
 // Draft overrides written by the site builder. Kept in localStorage (not
-// sessionStorage) so every tab — the builder, a Preview tab opened via
-// window.open, and already-open site tabs — sees the same draft. This is what
-// makes the Preview button show the edited version and lets edits appear
-// instantly on the website. Cleared on Save & Publish.
+// sessionStorage) so the builder and a Preview tab opened via window.open see
+// the same draft. They are applied ONLY in preview mode (URL ?preview=1) — the
+// main website never reads drafts, so edits in the builder do not affect it
+// until Save & Publish writes them to the API. Cleared on Save & Publish.
 let overrides: Record<string, unknown> = {};
 let storedOverrides: Record<string, unknown> | null = null;
 const OVERRIDE_KEY = 'puhub_builder_overrides';
@@ -145,11 +145,34 @@ export function mergeSectionWithDefault(
   return def;
 }
 
+const PREVIEW_KEY = 'puhub_preview_mode';
+
+/**
+ * True when this tab is a site-builder preview. The preview is entered via
+ * ?preview=1 and persisted in sessionStorage (per-tab), so navigating between
+ * pages inside the preview keeps drafts applied — while any other tab stays on
+ * published content.
+ */
+function isPreview(): boolean {
+  try {
+    if (new URLSearchParams(window.location.search).has('preview')) {
+      sessionStorage.setItem(PREVIEW_KEY, '1');
+      return true;
+    }
+    return sessionStorage.getItem(PREVIEW_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 function resolveSection(section: string): Record<string, unknown> {
   const def = ((siteDefaults as Record<string, unknown>)[section] as Record<string, unknown> | undefined) ?? {};
-  if (overrides[section]) return mergeSectionWithDefault(overrides[section], def) as Record<string, unknown>;
-  const stored = getStoredOverrides();
-  if (stored[section]) return mergeSectionWithDefault(stored[section], def) as Record<string, unknown>;
+  // Drafts are applied only in the preview tab — the live site never sees them.
+  if (isPreview()) {
+    if (overrides[section]) return mergeSectionWithDefault(overrides[section], def) as Record<string, unknown>;
+    const stored = getStoredOverrides();
+    if (stored[section]) return mergeSectionWithDefault(stored[section], def) as Record<string, unknown>;
+  }
   if (cache && cache[section]) return mergeSectionWithDefault(cache[section], def) as Record<string, unknown>;
   return def;
 }
@@ -169,8 +192,8 @@ export function useSiteSettings(): SiteSettings {
 
     // React to draft/publish changes made in other tabs (the site builder).
     const handler = (e: StorageEvent) => {
-      if (e.key === OVERRIDE_KEY) {
-        // Drafts changed/cleared elsewhere — re-read and re-render live.
+      if (e.key === OVERRIDE_KEY && isPreview()) {
+        // Drafts changed/cleared in the builder — only the preview tab follows.
         storedOverrides = null;
         setTick((n) => n + 1);
       } else if (e.key === PUBLISH_KEY) {

@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { X } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, X } from '@phosphor-icons/react';
 import { PageHeader } from '../components/landing/PageHeader';
 import { useSection } from '../hooks/useSiteSettings';
 import { siteDefaults, type MinistryData } from '../data/siteDefaults';
 import { ministryIcon } from '../data/ministries';
 
 export function MinistriesPage() {
+  const styles = useSection('styles', siteDefaults.styles);
+  const showIcon = !!styles.showIcons;
   const data = useSection('ministries', siteDefaults.ministries);
   const list =
     data.ministries && data.ministries.length > 0 ? data.ministries : siteDefaults.ministries.ministries;
@@ -144,9 +146,11 @@ export function MinistriesPage() {
             </div>
             <a
               href={data.cta?.href ?? siteDefaults.ministries.cta.href}
-              className="inline-flex items-center justify-center rounded-full bg-accent-cream text-ink px-7 py-3.5 font-display font-extrabold text-[15px] hover:bg-accent-cream-hover transition-colors"
+              className="btn-primary inline-flex items-center justify-center gap-2 rounded-full bg-accent-cream text-ink px-7 py-3.5 font-display font-extrabold text-[15px] hover:bg-accent-cream-hover transition-colors"
             >
+              {showIcon && styles.iconAlignment !== 'right' && <ArrowLeft size={17} weight="bold" />}
               {data.cta?.label ?? siteDefaults.ministries.cta.label}
+              {showIcon && styles.iconAlignment === 'right' && <ArrowRight size={17} weight="bold" />}
             </a>
           </div>
         </div>

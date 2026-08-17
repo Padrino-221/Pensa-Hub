@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CaretDown, CaretRight } from '@phosphor-icons/react';
+import { CaretDown, CaretRight, Trash } from '@phosphor-icons/react';
 import { Button } from '../ui/Button';
 import { ImageUpload } from '../ui/ImageUpload';
 import { formatBytes } from '../../lib/utils';
@@ -77,9 +77,11 @@ export function AddRemove({
               <button
                 type="button"
                 onClick={() => onRemove(i)}
-                className="text-xs font-bold text-danger hover:underline shrink-0 px-2 py-1 rounded-md hover:bg-danger/5"
+                className="shrink-0 p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors"
+                aria-label="Remove"
+                title="Remove"
               >
-                Remove
+                <Trash size={16} />
               </button>
             </div>
             {isOpen && (
@@ -141,7 +143,7 @@ function StringListEditor({ label, items, onChange, addLabel, placeholder }: {
         <div key={i} className="flex gap-2 items-start">
           <AreaInput value={p} onChange={(v) => onChange(items.map((x: string, idx: number) => (idx === i ? v : x)))} rows={2} placeholder={placeholder} />
           <button type="button" onClick={() => onChange(items.filter((_: string, idx: number) => idx !== i))}
-            className="mt-1 text-xs font-bold text-danger hover:underline shrink-0">Remove</button>
+            className="mt-1 shrink-0 p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors" aria-label="Remove" title="Remove"><Trash size={16} /></button>
         </div>
       ))}
       <Button type="button" variant="secondary" size="sm" className="self-start" onClick={() => onChange([...items, ''])}>{addLabel}</Button>
@@ -430,7 +432,7 @@ function LeadershipDirectoryForm({ value, onUpdate }: { value: any; onUpdate: (p
               {(groups[i]?.members ?? []).map((m: any, mi: number) => (
                 <div key={mi} className="rounded-[12px] bg-white border border-ink/10 p-3 space-y-2">
                   <div className="flex justify-end">
-                    <button type="button" onClick={() => removeMember(i, mi)} className="text-xs font-bold text-danger hover:underline">Remove</button>
+                    <button type="button" onClick={() => removeMember(i, mi)} className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors" aria-label="Remove" title="Remove"><Trash size={16} /></button>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-2">
                     <Field label="Role"><TextInput value={m?.role} onChange={(v) => setMemberAt(i, mi, { role: v })} placeholder="President" /></Field>
@@ -538,7 +540,7 @@ function MinistriesForm({ value, onUpdate }: { value: any; onUpdate: (patch: any
                   <div key={j} className="flex gap-2 items-start">
                     <TextInput value={a} onChange={(v) => setActivities(i, acts.map((x: string, idx: number) => (idx === j ? v : x)))} />
                     <button type="button" onClick={() => setActivities(i, acts.filter((_: string, idx: number) => idx !== j))}
-                      className="mt-1 text-xs font-bold text-danger hover:underline shrink-0">Remove</button>
+                      className="mt-1 shrink-0 p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors" aria-label="Remove" title="Remove"><Trash size={16} /></button>
                   </div>
                 ))}
                 <Button type="button" variant="secondary" size="sm" className="self-start" onClick={() => setActivities(i, [...acts, ''])}>Add activity</Button>
@@ -571,7 +573,7 @@ function CommunityForm({ section, value, onUpdate }: { section: string; value: a
           <div key={i} className="rounded-[12px] bg-ink/[0.03] border border-ink/10 p-3 space-y-2">
             <ImageUpload value={p} onChange={(v) => setPhotos(photos.map((x: string, idx: number) => (idx === i ? v : x)))} aspect="aspect-[4/3]" />
             <button type="button" onClick={() => setPhotos(photos.filter((_: string, idx: number) => idx !== i))}
-              className="text-xs font-bold text-danger hover:underline">Remove photo</button>
+              className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors" aria-label="Remove photo" title="Remove photo"><Trash size={16} /></button>
           </div>
         ))}
         <Button type="button" variant="secondary" size="sm" className="self-start" onClick={() => setPhotos([...photos, ''])}>Add photo</Button>
@@ -703,7 +705,7 @@ function ResourcesForm({ value, onUpdate }: { value: any; onUpdate: (patch: any)
                   <div key={j} className="rounded-[12px] bg-white border border-ink/10 p-3 space-y-2">
                     <div className="flex justify-end">
                       <button type="button" onClick={() => setItems(i, items.filter((_: any, idx: number) => idx !== j))}
-                        className="text-xs font-bold text-danger hover:underline">Remove</button>
+                        className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors" aria-label="Remove" title="Remove"><Trash size={16} /></button>
                     </div>
                     <Field label="Title"><TextInput value={item?.title} onChange={(v) => setItems(i, items.map((x: any, idx: number) => (idx === j ? { ...x, title: v } : x)))} /></Field>
                     <Field label="Description"><AreaInput value={item?.description} onChange={(v) => setItems(i, items.map((x: any, idx: number) => (idx === j ? { ...x, description: v } : x)))} rows={2} /></Field>

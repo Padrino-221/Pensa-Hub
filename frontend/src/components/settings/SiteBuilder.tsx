@@ -160,13 +160,17 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
     h.index = nh.length - 1;
   };
 
-  const update = useCallback((section: string, patch: any) => {
-    setDrafts((prev) => {
-      const next = { ...prev, [section]: { ...(prev[section] || {}), ...patch } };
+  const update = useCallback(
+    (section: string, patch: any) => {
+      // Compute the next state outside the setState updater: StrictMode invokes
+      // updater functions twice, so pushing history inside them would record
+      // every edit twice and break undo/redo.
+      const next = { ...drafts, [section]: { ...(drafts[section] || {}), ...patch } };
       pushHistory(JSON.stringify(next));
-      return next;
-    });
-  }, []);
+      setDrafts(next);
+    },
+    [drafts]
+  );
 
   const undo = () => {
     const h = historyRef.current;
@@ -224,7 +228,9 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
   };
 
   const openPreview = () => {
-    window.open('/', '_blank');
+    // Opens a preview of the site with the current drafts applied (?preview=1).
+    // The live site (no flag) is untouched until Save & Publish.
+    window.open('/?preview=1', '_blank');
   };
 
   return (

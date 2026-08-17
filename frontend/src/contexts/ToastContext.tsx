@@ -23,12 +23,6 @@ const ICONS: Record<ToastType, ReactNode> = {
   info: <Info size={20} weight="fill" className="text-info shrink-0" />,
 };
 
-const BAR: Record<ToastType, string> = {
-  success: 'bg-success',
-  error: 'bg-danger',
-  info: 'bg-info',
-};
-
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const idRef = useRef(0);
@@ -59,9 +53,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="relative overflow-hidden bg-white rounded-[14px] border border-ink/15 shadow-lg py-3.5 pl-4 pr-10 animate-toast-in"
+            className="relative bg-white rounded-[14px] border border-ink/15 shadow-lg py-3.5 pl-4 pr-10 animate-toast-in"
           >
-            <div className={`absolute left-0 top-0 bottom-0 w-1 ${BAR[t.type]}`} />
             <div className="flex items-center gap-3">
               {ICONS[t.type]}
               <p className="text-sm text-ink leading-snug">{t.message}</p>

@@ -1,3 +1,4 @@
+import { Trash } from '@phosphor-icons/react';
 import { Button } from '../ui/Button';
 import { ImageUpload } from '../ui/ImageUpload';
 import { Select } from '../ui/Select';
@@ -166,9 +167,11 @@ export function FlowForm({ value, onUpdate }: { value: any; onUpdate: (patch: an
                     <button
                       type="button"
                       onClick={() => setGroupAt(i, { children: children.filter((_: any, idx: number) => idx !== ci) })}
-                      className="mt-1 text-xs font-bold text-danger hover:underline shrink-0"
+                      className="mt-1 shrink-0 p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors"
+                      aria-label="Remove"
+                      title="Remove"
                     >
-                      Remove
+                      <Trash size={16} />
                     </button>
                   </div>
                 ))}

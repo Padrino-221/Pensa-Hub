@@ -47,6 +47,19 @@ export function buildThemeCss(sections: ThemeSections): string {
   ];
   parts.push(`:root{${root.join('')}}`);
 
+  // Styles > Button style: the site's primary CTAs carry the .btn-primary
+  // marker class; filled is the default (Tailwind utilities), outline and
+  // shadowed override it here. `a.btn-primary` out-specifies the Tailwind
+  // utilities (which are single-class), so these rules win.
+  if (styles.buttonStyle === 'outline') {
+    parts.push(
+      'a.btn-primary{background:transparent;border:2px solid var(--color-accent-cream);color:var(--color-accent-cream)}' +
+        'a.btn-primary:hover{background:color-mix(in srgb,var(--color-accent-cream) 14%,transparent)}',
+    );
+  } else if (styles.buttonStyle === 'shadowed') {
+    parts.push('a.btn-primary{box-shadow:0 14px 30px -14px var(--color-accent)}');
+  }
+
   if (!motion.revealAnimations) {
     parts.push(
       '.reveal,.reveal-from-left,.reveal-from-right,.reveal-zoom,.reveal-flip,.reveal-pop{opacity:1;transform:none;transition:none}',

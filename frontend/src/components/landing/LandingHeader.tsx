@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CaretDown, List, X } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, CaretDown, List, X } from '@phosphor-icons/react';
 import { NavLink } from 'react-router-dom';
 import { useSection } from '../../hooks/useSiteSettings';
 import { siteDefaults, type NavGroup } from '../../data/siteDefaults';
@@ -7,8 +7,17 @@ import { siteDefaults, type NavGroup } from '../../data/siteDefaults';
 export function LandingHeader() {
   const data = useSection('flow', siteDefaults.flow);
   const branding = useSection('branding', siteDefaults.branding);
+  const styles = useSection('styles', siteDefaults.styles);
   const navGroups: NavGroup[] =
     data.navGroups && data.navGroups.length > 0 ? data.navGroups : siteDefaults.flow.navGroups;
+  const showIcon = !!styles.showIcons;
+
+  const ctaIcon = (size: number) =>
+    styles.iconAlignment === 'right' ? (
+      <ArrowRight size={size} weight="bold" />
+    ) : (
+      <ArrowLeft size={size} weight="bold" />
+    );
 
   const [open, setOpen] = useState(false);
 
@@ -26,8 +35,13 @@ export function LandingHeader() {
             alt="PENSA UENR logo"
             className="w-8 h-8 object-contain"
           />
-          <span className="whitespace-nowrap">
-            {(branding.siteName as string) || 'PENSA-UENR'}
+          <span className="flex flex-col leading-tight whitespace-nowrap">
+            <span>{(branding.siteName as string) || 'PENSA-UENR'}</span>
+            {branding.siteTagline ? (
+              <span className="hidden lg:block text-[10px] font-semibold text-white/60 tracking-wide max-w-[260px] truncate">
+                {branding.siteTagline}
+              </span>
+            ) : null}
           </span>
         </NavLink>
 
@@ -75,8 +89,9 @@ export function LandingHeader() {
         <div className="flex items-center gap-4">
           <NavLink
             to="/ministries"
-            className="hidden lg:inline-flex items-center justify-center rounded-full bg-accent-cream text-ink px-6 py-2.5 font-display font-extrabold text-sm hover:bg-accent-cream-hover transition-colors"
+            className="btn-primary hidden lg:inline-flex items-center justify-center gap-2 rounded-full bg-accent-cream text-ink px-6 py-2.5 font-display font-extrabold text-sm hover:bg-accent-cream-hover transition-colors"
           >
+            {showIcon && ctaIcon(15)}
             Join PENSA
           </NavLink>
           <button
@@ -120,8 +135,9 @@ export function LandingHeader() {
             <NavLink
               to="/ministries"
               onClick={() => setOpen(false)}
-              className="mt-3 inline-flex items-center justify-center rounded-full bg-accent-cream text-ink px-6 py-3 font-display font-extrabold text-sm"
+              className="btn-primary mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-accent-cream text-ink px-6 py-3 font-display font-extrabold text-sm"
             >
+              {showIcon && ctaIcon(15)}
               Join PENSA
             </NavLink>
           </div>

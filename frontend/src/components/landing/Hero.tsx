@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import { useSection } from '../../hooks/useSiteSettings';
 import { siteDefaults, type HeroSlide } from '../../data/siteDefaults';
 
@@ -7,6 +8,8 @@ export function Hero() {
   const slides: HeroSlide[] =
     data.slides && data.slides.length > 0 ? data.slides : siteDefaults.hero.slides;
   const motion = useSection('motion', siteDefaults.motion);
+  const styles = useSection('styles', siteDefaults.styles);
+  const showIcon = !!styles.showIcons;
 
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -73,9 +76,11 @@ export function Hero() {
           <div className="flex flex-wrap gap-4">
             <a
               href={slide.cta.href}
-              className="inline-flex items-center justify-center rounded-full bg-accent-cream text-ink px-8 py-3.5 font-display font-extrabold text-[15px] hover:bg-accent-cream-hover hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+              className="btn-primary inline-flex items-center justify-center gap-2 rounded-full bg-accent-cream text-ink px-8 py-3.5 font-display font-extrabold text-[15px] hover:bg-accent-cream-hover hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
             >
+              {showIcon && styles.iconAlignment !== 'right' && <ArrowLeft size={18} weight="bold" />}
               {slide.cta.label}
+              {showIcon && styles.iconAlignment === 'right' && <ArrowRight size={18} weight="bold" />}
             </a>
             <a
               href={slide.ctaSecondary.href}
