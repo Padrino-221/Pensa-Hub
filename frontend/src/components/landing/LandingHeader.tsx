@@ -29,7 +29,7 @@ export function LandingHeader() {
   return (
     <header className="sticky top-0 z-40 bg-ink py-4">
       <div className="mx-auto w-full max-w-[1120px] px-6 md:px-12 flex items-center justify-between">
-        <NavLink to="/" className="inline-flex items-center gap-2.5 font-display font-extrabold text-lg text-white tracking-wide whitespace-nowrap lg:mr-8 xl:mr-12">
+        <NavLink to="/" className="inline-flex items-center gap-2.5 font-display font-extrabold text-lg text-white tracking-wide whitespace-nowrap lg:mr-6 xl:mr-10">
           <img
             src={(branding.logo as string) || '/logo.png'}
             alt="PENSA UENR logo"
@@ -45,7 +45,7 @@ export function LandingHeader() {
           </span>
         </NavLink>
 
-        <nav className="hidden lg:flex items-center lg:gap-10" aria-label="Primary">
+        <nav className="hidden lg:flex items-center lg:gap-8" aria-label="Primary">
           {navGroups.map((group) =>
             group.children && group.children.length > 0 ? (
               <div key={group.label} className="relative group">
@@ -86,10 +86,10 @@ export function LandingHeader() {
           )}
         </nav>
 
-        <div className="flex items-center gap-4 lg:ml-8">
+        <div className="flex items-center gap-4 lg:ml-6">
           <NavLink
             to="/contact"
-            className="btn-primary hidden lg:inline-flex items-center justify-center gap-2 rounded-full bg-accent-cream text-ink px-6 py-2.5 font-display font-extrabold text-sm hover:bg-accent-cream-hover transition-colors"
+            className="btn-primary hidden lg:inline-flex items-center justify-center gap-2 rounded-full bg-accent-cream text-ink px-6 py-2.5 font-display font-extrabold text-sm whitespace-nowrap shrink-0 hover:bg-accent-cream-hover transition-colors"
           >
             {showIcon && ctaIcon(15)}
             Join PENSA
@@ -135,7 +135,7 @@ export function LandingHeader() {
             <NavLink
               to="/contact"
               onClick={() => setOpen(false)}
-              className="btn-primary mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-accent-cream text-ink px-6 py-3 font-display font-extrabold text-sm"
+              className="btn-primary mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-accent-cream text-ink px-6 py-3 font-display font-extrabold text-sm whitespace-nowrap"
             >
               {showIcon && ctaIcon(15)}
               Join PENSA
