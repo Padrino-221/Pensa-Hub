@@ -45,7 +45,7 @@ export function BrandingForm({ value, onUpdate }: { value: any; onUpdate: (patch
       <Field label="Brand name (dashboard)"><TextInput value={value?.brandName} onChange={(v) => onUpdate({ brandName: v })} placeholder="PU-HUB" /></Field>
       <Field label="Brand tagline (dashboard)"><TextInput value={value?.brandTagline} onChange={(v) => onUpdate({ brandTagline: v })} placeholder="PENSA UENR Hub" /></Field>
       <Field label="Site name (header)"><TextInput value={value?.siteName} onChange={(v) => onUpdate({ siteName: v })} placeholder="PENSA-UENR" /></Field>
-      <Field label="Site tagline"><TextInput value={value?.siteTagline} onChange={(v) => onUpdate({ siteTagline: v })} placeholder="Pentecost Students & Associates · UENR" /></Field>
+      <Field label="Site tagline (header)"><TextInput value={value?.siteTagline} onChange={(v) => onUpdate({ siteTagline: v })} placeholder="Pentecost Students & Associates · UENR" /></Field>
     </div>
   );
 }
