@@ -8,6 +8,9 @@ interface ImageUploadProps {
   onChange: (url: string) => void;
   /** Called after a successful upload with the url and the file size in bytes. */
   onUploaded?: (meta: { url: string; size: number }) => void;
+  /** Called when the card's Remove button is clicked; when provided, the
+   *  entry is deleted entirely instead of just clearing the url. */
+  onRemove?: () => void;
   label?: string;
   hint?: string;
   aspect?: string;
@@ -26,7 +29,7 @@ function fileName(url: string): string {
   }
 }
 
-export function ImageUpload({ value, onChange, onUploaded, label, hint, aspect = 'aspect-video', kind = 'image' }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, onUploaded, onRemove, label, hint, aspect = 'aspect-video', kind = 'image' }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -79,9 +82,9 @@ export function ImageUpload({ value, onChange, onUploaded, label, hint, aspect =
       {label && <span className="text-sm font-bold text-ink">{label}</span>}
 
       {value ? (
-        <div className="rounded-[12px] border border-ink/20 overflow-hidden">
+        <div className="rounded-[12px] border border-ink/20 overflow-hidden w-fit max-w-full">
           {isFile ? (
-            <div className="flex items-center gap-3 px-4 py-4 bg-ink/[0.03]">
+            <div className="flex items-center gap-3 px-4 py-4 bg-ink/[0.03] min-w-[260px]">
               <FilePdf size={28} className="text-danger shrink-0" />
               <div className="min-w-0">
                 <p className="text-sm font-bold text-ink truncate">{fileName(value)}</p>
@@ -89,7 +92,7 @@ export function ImageUpload({ value, onChange, onUploaded, label, hint, aspect =
               </div>
             </div>
           ) : (
-            <div className={`w-full ${aspect} bg-ink/[0.03] relative`}>
+            <div className={`w-[300px] max-w-full ${aspect} bg-ink/[0.03] relative`}>
               <img src={value} alt="" className="w-full h-full object-cover" />
               {uploading && (
                 <div className="absolute inset-0 bg-ink/50 grid place-items-center text-white text-sm font-bold">
@@ -108,7 +111,7 @@ export function ImageUpload({ value, onChange, onUploaded, label, hint, aspect =
             </button>
             <button
               type="button"
-              onClick={() => onChange('')}
+              onClick={() => (onRemove ? onRemove() : onChange(''))}
               className="inline-flex items-center gap-1.5 text-xs font-bold text-danger hover:underline"
             >
               <Trash size={14} /> Remove

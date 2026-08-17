@@ -33,7 +33,7 @@ export function AreaInput({ value, onChange, rows = 3, placeholder }: { value: s
 }
 
 export function AddRemove({
-  count, onAdd, onRemove, addLabel, itemLabel, getTitle, children,
+  count, onAdd, onRemove, addLabel, itemLabel, getTitle, columns, children,
 }: {
   count: number; onAdd: () => void; onRemove: (i: number) => void;
   addLabel?: string;
@@ -41,6 +41,8 @@ export function AddRemove({
   itemLabel?: string;
   /** Optional current title for an item, shown in its header. */
   getTitle?: (i: number) => string;
+  /** Render items side by side (2 or 3 columns) instead of stacked. */
+  columns?: 1 | 2 | 3;
   children: (i: number) => React.ReactNode;
 }) {
   // Accordion: one item open at a time so the form stays short instead of a long scroll.
@@ -52,7 +54,15 @@ export function AddRemove({
   }, [count, open]);
 
   return (
-    <div className="space-y-3">
+    <div
+      className={
+        columns === 3
+          ? 'grid sm:grid-cols-2 xl:grid-cols-3 gap-3'
+          : columns === 2
+            ? 'grid sm:grid-cols-2 gap-3'
+            : 'space-y-3'
+      }
+    >
       {Array.from({ length: count }).map((_, i) => {
         const isOpen = open === i;
         const title = getTitle ? getTitle(i) : '';
@@ -466,8 +476,10 @@ function AboutForm({ value, onUpdate }: { value: any; onUpdate: (patch: any) => 
       <Field label="Title"><TextInput value={value?.title} onChange={(v) => onUpdate({ title: v })} placeholder="Basically disciples on campus" /></Field>
       <Field label="Vision"><AreaInput value={value?.vision} onChange={(v) => onUpdate({ vision: v })} rows={3} /></Field>
       <Field label="Mission"><AreaInput value={value?.mission} onChange={(v) => onUpdate({ mission: v })} rows={3} /></Field>
-      <ImageUpload label="Image" value={value?.image} onChange={(v) => onUpdate({ image: v })} />
-      <ImageUpload label="Header background image" value={value?.backgroundImage} onChange={(v) => onUpdate({ backgroundImage: v })} />
+      <div className="grid md:grid-cols-2 gap-3">
+        <ImageUpload label="Image" value={value?.image} onChange={(v) => onUpdate({ image: v })} />
+        <ImageUpload label="Header background image" value={value?.backgroundImage} onChange={(v) => onUpdate({ backgroundImage: v })} />
+      </div>
       <StringListEditor label="Story paragraphs" items={story} onChange={setStory} addLabel="Add paragraph" />
       <div className="rounded-[12px] bg-ink/[0.04] px-4 py-2 text-sm font-bold text-ink">History timeline</div>
       <AddRemove
@@ -564,18 +576,24 @@ function CommunityForm({ section, value, onUpdate }: { section: string; value: a
       <Field label="Kicker"><TextInput value={value?.kicker} onChange={(v) => onUpdate({ kicker: v })} placeholder={`Community · ${section.toUpperCase()}`} /></Field>
       <Field label="Title"><TextInput value={value?.title} onChange={(v) => onUpdate({ title: v })} placeholder={section} /></Field>
       <Field label="Page description"><TextInput value={value?.description} onChange={(v) => onUpdate({ description: v })} /></Field>
-      <ImageUpload label="Main image" value={value?.image} onChange={(v) => onUpdate({ image: v })} />
-      <ImageUpload label="Header background image" value={value?.backgroundImage} onChange={(v) => onUpdate({ backgroundImage: v })} />
+      <div className="grid md:grid-cols-2 gap-3">
+        <ImageUpload label="Main image" value={value?.image} onChange={(v) => onUpdate({ image: v })} />
+        <ImageUpload label="Header background image" value={value?.backgroundImage} onChange={(v) => onUpdate({ backgroundImage: v })} />
+      </div>
       <StringListEditor label="Body paragraphs" items={body} onChange={setBody} addLabel="Add paragraph" />
       <div className="flex flex-col gap-2">
         <label className="text-sm font-bold text-ink">Gallery photos</label>
-        {photos.map((p: string, i: number) => (
-          <div key={i} className="rounded-[12px] bg-ink/[0.03] border border-ink/10 p-3 space-y-2">
-            <ImageUpload value={p} onChange={(v) => setPhotos(photos.map((x: string, idx: number) => (idx === i ? v : x)))} aspect="aspect-[4/3]" />
-            <button type="button" onClick={() => setPhotos(photos.filter((_: string, idx: number) => idx !== i))}
-              className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors" aria-label="Remove photo" title="Remove photo"><Trash size={16} /></button>
-          </div>
-        ))}
+        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          {photos.map((p: string, i: number) => (
+            <ImageUpload
+              key={i}
+              value={p}
+              onChange={(v) => setPhotos(photos.map((x: string, idx: number) => (idx === i ? v : x)))}
+              onRemove={() => setPhotos(photos.filter((_: string, idx: number) => idx !== i))}
+              aspect="aspect-[4/3]"
+            />
+          ))}
+        </div>
         <Button type="button" variant="secondary" size="sm" className="self-start" onClick={() => setPhotos([...photos, ''])}>Add photo</Button>
       </div>
     </div>
@@ -598,6 +616,7 @@ function GalleryForm({ value, onUpdate }: { value: any; onUpdate: (patch: any) =
         addLabel="Add photo"
         itemLabel="Photo"
         getTitle={(i) => photos[i]?.alt || ''}
+        columns={3}
         onAdd={() => setPhotos([...photos, { src: '', alt: '' }])}
         onRemove={(i) => setPhotos(photos.filter((_: any, idx: number) => idx !== i))}
       >
