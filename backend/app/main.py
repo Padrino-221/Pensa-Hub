@@ -33,6 +33,7 @@ def on_startup():
     Base.metadata.create_all(bind=engine)
     _ensure_attendance_report_columns()
     _ensure_member_level_column()
+    _ensure_audit_target_id_column()
 
 
 # Idempotent column backfill for existing databases (no Alembic in this project).
@@ -59,6 +60,19 @@ def _ensure_attendance_report_columns():
                     f"ALTER TABLE attendance_sessions ADD COLUMN IF NOT EXISTS {column} {ddl}"
                 )
             )
+
+
+def _ensure_audit_target_id_column():
+    """Widen audit_logs.target_id from UUID to VARCHAR so it can hold
+    non-UUID references (e.g. settings section names). Idempotent."""
+    from sqlalchemy import text
+
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "ALTER TABLE audit_logs ALTER COLUMN target_id TYPE VARCHAR(100) USING target_id::text"
+            )
+        )
 
 
 def _ensure_member_level_column():

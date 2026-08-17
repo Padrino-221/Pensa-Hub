@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   ArrowClockwise,
   ArrowCounterClockwise,
+  ArrowSquareOut,
   CaretRight,
   Compass,
   Eye,
@@ -105,6 +106,7 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
   const [activeSection, setActiveSection] = useState('hero');
   const [saving, setSaving] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const page = PAGES.find((p) => p.id === pageId) ?? PAGES[0]!;
@@ -227,9 +229,10 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
     onClose();
   };
 
-  const openPreview = () => {
-    // Opens a preview of the site with the current drafts applied (?preview=1).
-    // The live site (no flag) is untouched until Save & Publish.
+  // Preview shows the site with the current drafts applied (?preview=1) inside
+  // the builder, so it works even where pop-ups are blocked. The live site (no
+  // flag) is untouched until Save & Publish.
+  const openPreviewTab = () => {
     window.open('/?preview=1', '_blank');
   };
 
@@ -269,7 +272,7 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={openPreview} icon={<Eye size={15} />}>
+          <Button variant="secondary" size="sm" onClick={() => setPreviewOpen(true)} icon={<Eye size={15} />}>
             Preview
           </Button>
           <Button size="sm" onClick={saveAll} loading={saving} icon={<FloppyDisk size={15} weight="bold" />}>
@@ -374,6 +377,35 @@ export function SiteBuilder({ onClose }: { onClose: () => void }) {
           ))}
         </aside>
       </div>
+
+      {/* ---------- Preview modal ---------- */}
+      {previewOpen && (
+        <div className="fixed inset-0 z-[250] bg-black/50 flex items-center justify-center p-4 md:p-8">
+          <div className="w-full max-w-[1280px] h-full max-h-[90vh] bg-white rounded-[16px] shadow-2xl flex flex-col overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-white border-b border-ink/10 shrink-0">
+              <Eye size={16} className="text-royal" />
+              <span className="text-sm font-extrabold text-ink">Preview</span>
+              <span className="text-xs text-ink-soft hidden sm:block">
+                Your unsaved edits are applied here — the live site stays unchanged until Save &amp; Publish.
+              </span>
+              <div className="ml-auto flex items-center gap-2">
+                <Button variant="secondary" size="sm" onClick={openPreviewTab} icon={<ArrowSquareOut size={14} />}>
+                  Open in new tab
+                </Button>
+                <button
+                  onClick={() => setPreviewOpen(false)}
+                  className="p-2 rounded-lg text-ink-soft hover:bg-ink/5 hover:text-ink transition-colors"
+                  aria-label="Close preview"
+                  title="Close preview"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+            <iframe src="/?preview=1" title="Site preview" className="w-full flex-1 border-0 bg-white" />
+          </div>
+        </div>
+      )}
 
       {/* ---------- Unsaved changes guard ---------- */}
       <Modal open={confirmClose} onClose={() => setConfirmClose(false)} title="Unsaved changes">

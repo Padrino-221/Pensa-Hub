@@ -149,7 +149,9 @@ class AuditLog(Base):
     user_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("users.id"))
     action: Mapped[str] = mapped_column(String(200))
     target_table: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    target_id: Mapped[str | None] = mapped_column(UUID(as_uuid=False), nullable=True)
+    # Informational reference, not a real FK: UUIDs for records, but plain
+    # strings where the target has no UUID (e.g. settings section names).
+    target_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

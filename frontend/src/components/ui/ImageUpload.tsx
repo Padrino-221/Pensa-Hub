@@ -39,6 +39,13 @@ export function ImageUpload({ value, onChange, onUploaded, label, hint, aspect =
       toast.error('Please choose a document file (PDF, Word, PowerPoint, Excel)');
       return;
     }
+    // Vercel functions cap request bodies at 4.5 MB, so in production limit
+    // uploads to 4 MB (dev keeps the backend limits: 5 MB images / 20 MB docs).
+    const limitMb = import.meta.env.DEV ? (isFile ? 20 : 5) : 4;
+    if (file.size > limitMb * 1024 * 1024) {
+      toast.error(`File exceeds ${limitMb} MB limit`);
+      return;
+    }
     setUploading(true);
     try {
       const form = new FormData();
