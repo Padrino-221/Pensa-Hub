@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Environment / secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cloudflare dev artifacts — contains account credentials (wrangler-account.json)
+.wrangler/
+
+# Static design prototypes (not part of the app)
+prototype/
+
+# Logs
+*.log
+npm-debug.log*
