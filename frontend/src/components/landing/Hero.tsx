@@ -42,17 +42,18 @@ export function Hero() {
           alt=""
           aria-hidden="true"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            i === current ? 'opacity-35' : 'opacity-0'
+            i === current ? 'opacity-45' : 'opacity-0'
           }`}
         />
       ))}
 
-      {/* Gradient overlay */}
+      {/* Gradient overlay — darker on the left to keep text readable,
+          gradually more transparent toward the right so the image pops */}
       <div
         className="pointer-events-none absolute inset-0 transition-opacity duration-1000"
         style={{
           backgroundImage:
-            'linear-gradient(to right, rgba(15,29,110,0.95) 0%, rgba(22,40,158,0.75) 40%, rgba(22,40,158,0.35) 70%, rgba(22,40,158,0.15) 100%)',
+            'linear-gradient(to right, rgba(15,29,110,0.92) 0%, rgba(22,40,158,0.85) 25%, rgba(22,40,158,0.65) 50%, rgba(22,40,158,0.35) 75%, rgba(22,40,158,0.10) 100%)',
         }}
         aria-hidden="true"
       />
